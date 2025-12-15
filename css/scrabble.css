@@ -1,0 +1,38 @@
+/*** Tags ***/
+
+/*** Classes ***/
+.slot {
+    background-size: 100% 100%;
+    height: auto;               /* take max height possible */
+    flex: 1;
+}
+
+/*** IDs ***/
+/*
+Flexbox resources:
+https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Flexible_box_layout
+https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/justify-items
+https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Flexible_box_layout/Controlling_flex_item_ratios
+*/
+#board {
+    background-image: url('../images/Scrabble_Board_OneLine.png');
+    background-size: 100% 100%;
+    display: flex;
+    gap: 6px;
+    padding: 6px;
+    width: 1129px;      /* actual img width */
+    height: 80px;       /* actual img height */
+    
+}
+
+/* similar to board css */
+#rack {
+    background-image: url('../images/scrabble-tile-holder-406774_640.png');
+    background-size: 100% 100%;
+    display: flex;
+    gap: 6px;
+    padding: 6px 6px 18px 6px;
+    width: 540px;
+    height: 80px;
+
+}
