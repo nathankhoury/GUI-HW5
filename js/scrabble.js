@@ -1,34 +1,45 @@
 /**********************************
  *  global variables/objects
  **********************************/
-// board object
-let board = {};
-// array of references to board slots
-board.references = [
-    $('#slot0'), $('#slot1'), $('#slot2'), $('#slot3'), $('#slot4'),
-    $('#slot5'), $('#slot6'), $('#slot7'), $('#slot8'), $('#slot9'),
-    $('#slot10'), $('#slot11'), $('#slot12'), $('#slot13'), $('#slot14')
+
+// board
+let board = {};         // board object
+
+board.slots = [    // array of references to board slots
+    $('#board_slot0'), $('#board_slot1'), $('#board_slot2'), $('#board_slot3'), $('#board_slot4'),
+    $('#board_slot5'), $('#board_slot6'), $('#board_slot7'), $('#board_slot8'), $('#board_slot9'),
+    $('#board_slot10'), $('#board_slot11'), $('#board_slot12'), $('#board_slot13'), $('#board_slot14')
 ];
-// array to hold keys of tiles placed on board
-board.keys = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
-board.keysToString = function() {
+
+board.tiles = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
+
+board.keys = [          // array to hold keys of tiles on board
+    null, null, null, null, null, null, null, null,     
+    null, null, null, null, null, null, null
+];
+
+board.keysToString = function() {       // format a string of keys in board.keys and print to console for debugging
     let str = "board keys: ";
     for (let i = 0; i < board.keys.length; i++) {
         str += board.keys[i] + " ";
     }
+
     console.log(str);
 }
 
-// rack object
-let rack = {};
-// array of references to rack tiles
-rack.references = [
-    $('#tile0'), $('#tile1'), $('#tile2'), $('#tile3'), 
-    $('#tile4'), $('#tile5'), $('#tile6')
-];
-// array to hold keys of tiles on rack
-rack.keys = [null, null, null, null, null, null, null];
-rack.keysToString = function() {
+// rack
+let rack = {};          // rack object
+
+rack.slots = [     // array of references to rack slots
+    $('#rack_slot0'), $('#rack_slot1'), $('#rack_slot2'), $('#rack_slot3'), 
+    $('#rack_slot4'), $('#rack_slot5'), $('#rack_slot6')
+]; 
+
+rack.tiles = [null, null, null, null, null, null, null];    // array of references to original tile placement in rack
+
+rack.keys = [null, null, null, null, null, null, null];     // array to hold keys of tiles on rack
+
+rack.keysToString = function() {                        // format a string of keys in rack.keys and print to console for debugging
     let str = "rack keys: ";
     for (let i = 0; i < rack.keys.length; i++) {
         str += rack.keys[i] + " ";
@@ -36,9 +47,11 @@ rack.keysToString = function() {
     console.log(str);
 }
 
-// bag object
-bag = {};
+// bag
+bag = {};                   // bag object
+
 bag.remaining = 100;        // total tiles at start of game
+
 bag.tiles = ScrabbleTiles;  // reference to provided associative array
 
 
@@ -46,6 +59,82 @@ bag.tiles = ScrabbleTiles;  // reference to provided associative array
  *  global functions
  **********************************/
 
+function initSubmitButton() {
+
+}
+
+function initReturnButton() {
+    // set onclick listener
+    $("#return_button").on("click", function() {
+        // debug
+        console.log("Returning tiles to bag...");
+        // iterate through rack slots
+        for (let i = 0; i < rack.slots.length; i++) {
+            // move tile back to rack
+            rack.tiles[i].appendTo(rack.slots[i]);   // move tile back to original rack slot
+        }
+    });
+}
+
+function initResetButton() {
+
+}   
+
+function initButtonCallbacks() {
+    // submit word listener
+    initSubmitButton();
+    // return tiles listener
+    initReturnButton();
+    // reset game listener
+    initResetButton();
+}
+
+function dragStartHandler(ev) {
+    // copy the id of the <img> element (the tile)
+    ev.originalEvent.dataTransfer.setData("text", ev.target.id);
+}
+
+function dragoverHandler(ev) {
+    // just prevent default behaviors
+    ev.preventDefault();
+    ev.originalEvent.preventDefault();
+}
+
+function dropHandler(ev) {
+    // prevent default behaviors
+    ev.preventDefault();
+    ev.originalEvent.preventDefault();
+
+    // retrieve the id of the <img>
+    const id = ev.originalEvent.dataTransfer.getData("text");
+    // retrive the actual <img> from id using DOM
+    const tile = document.getElementById(id);
+    // get the target slot
+    const slot = ev.target.closest(".slot");
+    // if failure to get either, just return and reject drop
+    if (!slot || !tile) return;
+
+    if (slot.querySelector(".tile")) {
+        // there's already a tile there, reject drop
+        console.log("slot already occupied by tile");
+        return;
+    }
+
+    // 
+
+    slot.appendChild(tile);
+}
+
+// apply all the necessary handlers to implement drag-and-drop functionality
+function initDragDrop() {
+    // implementations from https://www.w3schools.com/html/html5_draganddrop.asp
+    // set onDragStart
+    $(".tile").on("dragstart", dragStartHandler);
+    // set onDragOver
+    $(".slot").on("dragover", dragoverHandler);
+    // set onDrop
+    $(".slot").on("drop", dropHandler);
+}
 
 // get a random letter from ScrabbleTiles
 function randomTile() {
@@ -61,6 +150,7 @@ function randomTile() {
             console.log("selected tile: " + key);
             return key;
         } else {
+            // subtract and iterate
             randomIndex -= bag.tiles[key]["number-remaining"];
         }
     }
@@ -69,18 +159,29 @@ function randomTile() {
 // populate rack with initial tiles
 function populateRack() {
     console.log("populating the player's rack with tiles")
-    for (let i = 0; i < rack.references.length; i++) {
+    for (let i = 0; i < rack.slots.length; i++) {
         // get a random letter from ScrabbleTiles
         let key = randomTile();
-        // set the image source
-        rack.references[i].css("background-image", "url('../images/Scrabble_Tiles/" + bag.tiles[key]["img"] + "')");
+        // make a new img element for the tile
+        let $tile = $("<img>")
+            .addClass("tile")
+            .attr("id", "rack_tile" + i)
+            .attr("src", "../images/Scrabble_Tiles/" + bag.tiles[key]["img"])
+            .attr("alt", key)
+            .prop("draggable", true);
+        // place the tile in the corresponding slot
+        const slotStr = "#rack_slot" + i;
+        $(slotStr).append($tile);
         // decrement the number-remaining for that letter
         bag.tiles[key]["number-remaining"]--;
         // decrement the total remaining in the bag
         bag.remaining--;
         // store the key in the rack.keys array
         rack.keys[i] = key;
-
+        // store the tile in rack.tiles
+        rack.tiles[i] = $("#rack_tile" + i);
+        
+        // debug output
         console.log("placed " + key + " on rack pos " + i + ", new num remaining: " + bag.tiles[key]["number-remaining"] );
     }
 }
@@ -90,5 +191,6 @@ function populateRack() {
  **********************************/
 $(document).ready(function() {
     populateRack();
-    rack.keysToString();
+    initDragDrop();
+    initButtonCallbacks();
 });

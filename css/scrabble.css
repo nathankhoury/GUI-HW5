@@ -7,6 +7,17 @@
     flex: 1;
 }
 
+.tile {
+    width: 100%;                /* take full width of slot */
+    height: auto;               /* maintain aspect ratio */
+    cursor: grab;               /* indicate draggable */
+}
+
+.buttons {
+    padding : 12px;
+    margin : 8px;
+}
+
 /*** IDs ***/
 /*
 Flexbox resources:
@@ -32,6 +43,7 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Flexible_box_layout/Cont
     display: flex;
     gap: 6px;
     padding: 6px 6px 18px 6px;
+    margin: 8px;
     width: 540px;
     height: 80px;
 
