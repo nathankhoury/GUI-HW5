@@ -77,7 +77,32 @@ function initReturnButton() {
 }
 
 function initResetButton() {
-
+    $("#reset_button").on("click", function() {
+        // debug
+        console.log("Resetting game...");
+        // iterate through associative array and reset number-remaining
+        for (let key in bag.tiles) {
+            bag.tiles[key]["number-remaining"] = bag.tiles[key]["original-distribution"];
+        }
+        // reset total remaining in bag
+        bag.remaining = 100;
+        // clear board
+        for (let i = 0; i < board.slots.length; i++) {
+            board.tiles[i] = null;
+            board.keys[i] = null;
+            board.slots[i].empty();
+        }
+        // clear rack
+        for (let i = 0; i < rack.slots.length; i++) {
+            rack.tiles[i] = null;
+            rack.keys[i] = null;
+            rack.slots[i].empty();
+        }
+        // populate rack again
+        populateRack();
+        // re-initialize drag-and-drop functionality
+        initDragDrop();
+    });
 }   
 
 function initButtonCallbacks() {
@@ -190,7 +215,10 @@ function populateRack() {
  *  main program driver
  **********************************/
 $(document).ready(function() {
+    // fill the rack with 7 new tiles from the bag
     populateRack();
+    // initialize drag-and-drop functionality, setting listeners
     initDragDrop();
+    // initialize UI button callbacks
     initButtonCallbacks();
 });
