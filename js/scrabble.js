@@ -101,7 +101,7 @@ function initResetButton() {
         // populate rack again
         populateRack();
         // re-initialize drag-and-drop functionality
-        initDragDrop();
+        initDragDrop();3
     });
 }   
 
@@ -191,7 +191,7 @@ function populateRack() {
         let $tile = $("<img>")
             .addClass("tile")
             .attr("id", "rack_tile" + i)
-            .attr("src", "../images/Scrabble_Tiles/" + bag.tiles[key]["img"])
+            .attr("src", "images/Scrabble_Tiles/" + bag.tiles[key]["img"])
             .attr("alt", key)
             .prop("draggable", true);
         // place the tile in the corresponding slot
