@@ -60,7 +60,7 @@ bag.tiles = ScrabbleTiles;  // reference to provided associative array
  **********************************/
 
 function initSubmitButton() {
-
+    // stub function for submit button
 }
 
 function initReturnButton() {
@@ -144,8 +144,6 @@ function dropHandler(ev) {
         console.log("slot already occupied by tile");
         return;
     }
-
-    // 
 
     slot.appendChild(tile);
 }

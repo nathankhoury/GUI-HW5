@@ -1,4 +1,9 @@
 /*** Tags ***/
+body {
+    text-align: center;
+    font-family: 'Trebuchet MS', sans-serif;
+    background: #e7d9c1;
+}
 
 /*** Classes ***/
 .slot {
@@ -16,6 +21,8 @@
 .buttons {
     padding : 12px;
     margin : 8px;
+    font-weight: bold;
+    border: 3px solid black;
 }
 
 /*** IDs ***/
@@ -33,7 +40,7 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Flexible_box_layout/Cont
     padding: 6px;
     width: 1129px;      /* actual img width */
     height: 80px;       /* actual img height */
-    
+    margin: 20px auto 40px auto;   
 }
 
 /* similar to board css */
@@ -43,8 +50,57 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Flexible_box_layout/Cont
     display: flex;
     gap: 6px;
     padding: 6px 6px 18px 6px;
-    margin: 8px;
+    margin: 10px auto 10px auto;
     width: 540px;
     height: 80px;
+}
 
+#mainHeader {
+    font-size: 60px;
+    color: rgb(0, 40, 82);
+    text-shadow: 2px 2px 3px #ffffff;
+    font-weight: bold;
+    letter-spacing: 30px;
+}
+
+#reset_button {
+    background-color: #ff6565;
+}
+
+#reset_button:hover {
+    background-color: #ef4444;
+    cursor: pointer;
+}
+
+#reset_button:active {
+    background-color: #bb3333;
+    cursor: grabbing;
+}
+
+#submit_button {
+    background-color: #8edf99;
+}
+
+#submit_button:hover {
+    background-color: #57c85a;
+    cursor: pointer;
+}
+
+#submit_button:active {
+    background-color: #44b241;
+    cursor: grabbing;
+}
+
+#return_button {
+    background-color: #b2b2ff;
+}
+
+#return_button:hover {
+    background-color: #7f7fff;
+    cursor: pointer;
+}
+
+#return_button:active {
+    background-color: #5c5cff;
+    cursor: grabbing;
 }
