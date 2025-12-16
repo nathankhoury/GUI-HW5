@@ -101,7 +101,7 @@ function initResetButton() {
         // populate rack again
         populateRack();
         // re-initialize drag-and-drop functionality
-        initDragDrop();3
+        initDragDrop();
     });
 }   
 
