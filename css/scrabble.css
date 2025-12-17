@@ -3,6 +3,7 @@ body {
     text-align: center;
     font-family: 'Trebuchet MS', sans-serif;
     background: #e7d9c1;
+    padding: 20px;
 }
 
 /*** Classes ***/
@@ -18,6 +19,13 @@ body {
     cursor: grab;               /* indicate draggable */
 }
 
+.tile_dummy {
+    width: 70px;
+    height: 77px;
+    display: inline-block;
+    cursor: grab;
+}
+
 .buttons {
     padding : 12px;
     margin : 8px;
@@ -27,14 +35,42 @@ body {
 
 .pair {
     margin: 16px;
+    display: block;
 }
 
 .label {
     display: inline-block;
+    font-weight: bolder;
 }
 
 .value {
     display: inline-block;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: hsl(44, 22%, 67%);
+    color: black;
+    border: black 2px solid;
+}
+
+.accordion-button.collapsed {
+    background-color: hsl(44, 22%, 67%);
+    border: black 2px solid;
+}
+
+.accordion {
+    --bs-accordion-border-color: hsl(44, 22%, 67%);
+}
+
+.accordion-body {
+    background-color: hsl(43, 76%, 90%);
+    text-align: left;
+    border: black 2px solid;
+}
+
+.instructionalHeader {
+    font-weight: bold;
+    text-decoration: underline;
 }
 
 /*** IDs ***/
@@ -115,4 +151,62 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Flexible_box_layout/Cont
 #return_button:active {
     background-color: #5c5cff;
     cursor: grabbing;
+}
+
+#reset_button_dummy {
+    background-color: #ff6565;
+}
+
+#reset_button_dummy:hover {
+    background-color: #ef4444;
+    cursor: pointer;
+}
+
+#reset_button_dummy:active {
+    background-color: #bb3333;
+    cursor: grabbing;
+}
+
+#submit_button_dummy {
+    background-color: #8edf99;
+}
+
+#submit_button_dummy:hover {
+    background-color: #57c85a;
+    cursor: pointer;
+}
+
+#submit_button_dummy:active {
+    background-color: #44b241;
+    cursor: grabbing;
+}
+
+#return_button_dummy {
+    background-color: #b2b2ff;
+}
+
+#return_button_dummy:hover {
+    background-color: #7f7fff;
+    cursor: pointer;
+}
+
+#return_button_dummy:active {
+    background-color: #5c5cff;
+    cursor: grabbing;
+}
+
+#scoredWordsList {
+    list-style-type: none;
+    text-align: center;
+    padding: 0;
+}
+
+#scoredWordsHeader {
+    display: none;
+}
+
+#instructions {
+    max-width: 1200px;
+    min-width: 800px;
+    margin: 20px auto 20px auto;
 }

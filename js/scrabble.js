@@ -57,12 +57,21 @@ bag.tiles = ScrabbleTiles;  // reference to provided associative array
 // game
 let game = {}       // game object
 
-game.total = 0      // total score
+game.total = 0;      // total score
+
+game.firstWord = true;
 
 
 /**********************************
  *  global functions
  **********************************/
+
+function clearScoredWordsList() {
+    // clear list
+    $("#scoredWordsList").empty();
+    // hide header
+    $("#scoredWordsHeader").attr("style", "display: none;");
+}
 
 function clearBoard() {
     for (let i = 0; i < board.slots.length; i++) {
@@ -82,6 +91,8 @@ function clearRack() {
 
 function initSubmitButton() {
     $("#submit_button").on("click", function() {
+        // begin constructing word string
+        let word = "";
         // determine bonus letters i=6,8
         let doubleKey1 = board.slots[6].find(".tile").attr("alt");
         let val1 = 0;
@@ -113,11 +124,27 @@ function initSubmitButton() {
         // iterate through all regular slots
         let total = 0;
         for (let i = 0; i < board.slots.length; i++) {
-            if (i == 2 || i == 6 || i == 8 || i == 12)
-                continue;
-            let curr = board.slots[i].find(".tile").attr("alt");
-            if (curr !== undefined) {
-                total += bag.tiles[curr]["value"];
+            switch (i) {
+                case 2:
+                    if (wordKey1 !== undefined) { word += wordKey1; }
+                    break;
+                case 6:
+                    if (doubleKey1 !== undefined) { word += doubleKey1; }
+                    break;
+                case 8:
+                    if (doubleKey2 !== undefined) { word += doubleKey2; }
+                    break;
+                case 12:
+                    if (wordKey2 !== undefined) { word += wordKey2; }
+                    break;
+                default:
+                    let curr = board.slots[i].find(".tile").attr("alt");
+                    if (curr !== undefined) {
+                        total += bag.tiles[curr]["value"];
+                        // append letter
+                        word += curr;
+                    }
+                    break;
             }
         }
         // total
@@ -127,6 +154,15 @@ function initSubmitButton() {
         game.total += total;
         // display total
         $("#totalScore").text(game.total);
+        // make new list item in scored word list
+        let $li = $("<li>").text(word + " - " + total + " points");
+        if (game.firstWord) {
+            // set display to unset
+            $("#scoredWordsHeader").attr("style", "display: unset;");
+            game.firstWord = false;
+        }
+        // append to list
+        $("#scoredWordsList").append($li);
         // clear board
         clearBoard();
         // clear rack
@@ -165,6 +201,10 @@ function initResetButton() {
         game.total = 0;
         // update total on screen;
         $("#totalScore").text(game.total);
+        // clear scored words list
+        clearScoredWordsList();
+        // reset firstWord flag
+        game.firstWord = true;
         // clear board
         clearBoard();
         // clear rack
@@ -235,6 +275,11 @@ function randomTile() {
     // get a random number between 0 and bag.tiles - 1
     let randomIndex = Math.floor(Math.random() * bag.remaining);
 
+    // check if 0 tiles left
+    if (bag.remaining <= 0) {
+        return "NO TILES";
+    }
+
     console.log("got random tile index: " + randomIndex);
 
     // iterate through bag.tiles to find the letter
@@ -256,6 +301,10 @@ function populateRack() {
     for (let i = 0; i < rack.slots.length; i++) {
         // get a random letter from ScrabbleTiles
         let key = randomTile();
+        if (key === "NO TILES") {
+            // break out of the loop
+            break;
+        }
         // make a new img element for the tile
         let $tile = $("<img>")
             .addClass("tile")
@@ -278,6 +327,8 @@ function populateRack() {
         // debug output
         console.log("placed " + key + " on rack pos " + i + ", new num remaining: " + bag.tiles[key]["number-remaining"] );
     }
+    // update tiles in bag
+    $("#tilesRemaining").text(bag.remaining);
 }
 
  /**********************************
