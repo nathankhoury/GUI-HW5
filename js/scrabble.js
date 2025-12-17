@@ -48,19 +48,94 @@ rack.keysToString = function() {                        // format a string of ke
 }
 
 // bag
-bag = {};                   // bag object
+let bag = {};                   // bag object
 
 bag.remaining = 100;        // total tiles at start of game
 
 bag.tiles = ScrabbleTiles;  // reference to provided associative array
+
+// game
+let game = {}       // game object
+
+game.total = 0      // total score
 
 
 /**********************************
  *  global functions
  **********************************/
 
+function clearBoard() {
+    for (let i = 0; i < board.slots.length; i++) {
+        board.tiles[i] = null;
+        board.keys[i] = null;
+        board.slots[i].empty();
+    }
+}
+
+function clearRack() {
+    for (let i = 0; i < rack.slots.length; i++) {
+        rack.tiles[i] = null;
+        rack.keys[i] = null;
+        rack.slots[i].empty();
+    }
+}
+
 function initSubmitButton() {
-    // stub function for submit button
+    $("#submit_button").on("click", function() {
+        // determine bonus letters i=6,8
+        let doubleKey1 = board.slots[6].find(".tile").attr("alt");
+        let val1 = 0;
+        let doubleKey2 = board.slots[8].find(".tile").attr("alt");
+        let val2 = 0;
+        console.log("double letters " + doubleKey1 + ", " + doubleKey2);
+        if (doubleKey1 !== undefined) {
+            val1 = bag.tiles[doubleKey1]["value"] * 2;
+        }
+        if (doubleKey2 !== undefined) {
+            val2 = bag.tiles[doubleKey2]["value"] * 2;
+        }
+        // begin partial sum
+        let partial = val1 + val2;
+        // determine word multiplier i=2,12
+        let wordMult = 1;
+        let wordKey1 = board.slots[2].find(".tile").attr("alt");
+        let wordKey2 = board.slots[12].find(".tile").attr("alt");
+        if (wordKey1 !== undefined) {
+            wordMult *= 2;
+            // update partial sum
+            partial += bag.tiles[wordKey1]["value"];
+        }
+        if (wordKey2 !== undefined) {
+            wordMult *= 2;
+            // update partial sum
+            partial += bag.tiles[wordKey2]["value"];
+        }
+        // iterate through all regular slots
+        let total = 0;
+        for (let i = 0; i < board.slots.length; i++) {
+            if (i == 2 || i == 6 || i == 8 || i == 12)
+                continue;
+            let curr = board.slots[i].find(".tile").attr("alt");
+            if (curr !== undefined) {
+                total += bag.tiles[curr]["value"];
+            }
+        }
+        // total
+        total += partial;
+        total *= wordMult;
+        // pass to game object
+        game.total += total;
+        // display total
+        $("#totalScore").text(game.total);
+        // clear board
+        clearBoard();
+        // clear rack
+        clearRack();
+        // fill rack again
+        populateRack();
+        // re-initialize drag-and-drop functionality
+        initDragDrop();
+    });
 }
 
 function initReturnButton() {
@@ -86,18 +161,14 @@ function initResetButton() {
         }
         // reset total remaining in bag
         bag.remaining = 100;
+        // reset game total
+        game.total = 0;
+        // update total on screen;
+        $("#totalScore").text(game.total);
         // clear board
-        for (let i = 0; i < board.slots.length; i++) {
-            board.tiles[i] = null;
-            board.keys[i] = null;
-            board.slots[i].empty();
-        }
+        clearBoard();
         // clear rack
-        for (let i = 0; i < rack.slots.length; i++) {
-            rack.tiles[i] = null;
-            rack.keys[i] = null;
-            rack.slots[i].empty();
-        }
+        clearRack();
         // populate rack again
         populateRack();
         // re-initialize drag-and-drop functionality

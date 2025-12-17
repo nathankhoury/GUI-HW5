@@ -25,6 +25,18 @@ body {
     border: 3px solid black;
 }
 
+.pair {
+    margin: 16px;
+}
+
+.label {
+    display: inline-block;
+}
+
+.value {
+    display: inline-block;
+}
+
 /*** IDs ***/
 /*
 Flexbox resources:
