@@ -52,10 +52,16 @@
               nor does it give you any new tiles from the bag. It simply allows you to experiment with different
               word formations without inconvenience.<br>
               <button id="reset_button_dummy" class="buttons">Reset Game</button><br>
-              Finally, the <strong>Reset Game</strong> button will instantaneously reset the game state. Your score
+              Using the <strong>Reset Game</strong> button will instantaneously reset the game state. Your score
               will be set back to 0, the bag will be refilled to 100 tiles, and both the board and rack will be cleared.
               This is useful if you want to start a fresh game without having to reload the page, but note that you will
-              completely lose your current progress!<br><br>
+              completely lose your current progress!<br>
+              <button id="pass_button_dummy" class="buttons">Pass</button><br>
+              Lastly, the <strong>Pass</strong> button allows you to skip your current turn. This will clear all 7 tiles
+              that you currently have available to use, and give you 7 brand new tiles from the bag. This is useful if you
+              truly find yourself stuck and want to cut your losses. To reiterate, passing will <strong>permenently discard</strong>
+              your current tiles, so use this option wisely.
+              <br><br>
             <h4 class="instructionalHeader">Anything else to know?</h4><br>
             It is important to understand how exactly tile placement is handled. If you board has no tiles on it,
             you may place a tile in any slot. However, once there is at least one tile on the board, any new tiles
@@ -74,6 +80,7 @@
     <button id="submit_button" class="buttons">Submit Word</button>
     <button id="return_button" class="buttons">Return Tiles</button>
     <button id="reset_button" class="buttons">Reset Game</button>
+    <button id="pass_button" class="buttons">Pass</button>
     <div id="board">
       <div id="board_slot0" class="slot"></div>
       <div id="board_slot1" class="slot"></div>
@@ -92,6 +99,7 @@
       <div id="board_slot14" class="slot"></div>
     </div>
     <div>
+      <div id="status"></div>
       <span class="pair">
         <div class="label">Word Potential: </div>
         <div id="potentialScore" class="value">0</div>

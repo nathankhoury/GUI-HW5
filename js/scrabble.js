@@ -1,10 +1,3 @@
-/*
-* TODO:
-        -Win condition
-        -Prevent submissions with gaps
-        -Fill rack, don't waste tiles
-*/
-
 /**********************************
  *  global variables/objects
  **********************************/
@@ -76,14 +69,17 @@ game.firstWord = true;
  **********************************/
 
 function validateWord() {
-    let status = true, requireNothing = false, start = false, gap = false;
+    let status = 1, requireNothing = false, start = false, gap = false;
+
+    // set css
+    $("#status").css("color", "red");
 
     for (let i = 0; i < board.slots.length; i++) {
         if (board.slots[i].find(".tile").length > 0) {
             if (!start)
                 start = true;   // word has begun
             if (requireNothing)
-                status = false; // found a gap in the word, return false
+                status = -1; // found a gap in the word, return false
         } else {
             if (start) {
                 requireNothing = true;  // end of word found, no other letters allowed
@@ -92,9 +88,15 @@ function validateWord() {
     }
 
     if (!start)
-        status = false; // no tiles on board
+        status = -2; // no tiles on board
 
     return status;
+}
+
+function clearStatus() {
+    $("#status").text("");
+    // set color back to default red
+    $("#status").css("color", "red");
 }
 
 function clearScoredWordsList() {
@@ -189,9 +191,18 @@ function calculateScore() {
 
 function initSubmitButton() {
     $("#submit_button").on("click", function() {
-        if (!validateWord()) {
-            // word is not valid
+        let status = validateWord();
+        if (status === -1) {
+            // word is not valid, there's a gap
+            $("#status").text("Invalid Submission: There's a gap in the word. Be sure to only create words that place tiles adjacent to each other!");
+            return; 
+        } else if (status === -2) {
+            // word is not valid, empty board
+            $("#status").text("Invalid Submission: You can't submit an empty board! Try dragging and dropping tiles onto the board, or read the instructions if you're stuck!");
             return;
+        } else {
+            // word was valid, status === 1
+            clearStatus();
         }
 
         // calculate the score
@@ -263,12 +274,31 @@ function initResetButton() {
         clearBoard(true);
         // clear rack
         clearRack(true);
+        // clear status
+        clearStatus();
         // populate rack again
         populateRack();
         // re-initialize drag-and-drop functionality
         initDragDrop();
     });
 }   
+
+function initPassButton() {
+    $("#pass_button").on("click", function() {
+        // debug
+        console.log("Passing turn...");
+        // clear board
+        clearBoard(true);
+        // clear rack, trample unused tiles
+        clearRack(true);
+        // clear status
+        clearStatus();
+        // fill rack again
+        populateRack();
+        // re-initialize drag-and-drop functionality
+        initDragDrop();
+    });
+}
 
 function initButtonCallbacks() {
     // submit word listener
@@ -277,6 +307,8 @@ function initButtonCallbacks() {
     initReturnButton();
     // reset game listener
     initResetButton();
+    // pass turn listener
+    initPassButton();
 }
 
 function dragStartHandler(ev) {
@@ -416,6 +448,19 @@ function populateRack() {
         // get a random letter from ScrabbleTiles
         let key = randomTile();
         if (key === "NO TILES") {
+            // check if 0 tiles in back and rack
+            if (bag.remaining === 0) {
+                let empty = true;
+                for (let i = 0; i < rack.slots.length; i++) {
+                    if (rack.slots[i].find(".tile").length > 0) {
+                        empty = false;
+                        break;
+                    }
+                }
+                if (empty) {
+                    $("#status").text("Gameover! You've run out of tiles, thanks for playing!").css("color", "green");
+                }
+            }
             // break out of the loop
             break;
         }
