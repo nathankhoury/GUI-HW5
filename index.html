@@ -56,6 +56,17 @@
               will be set back to 0, the bag will be refilled to 100 tiles, and both the board and rack will be cleared.
               This is useful if you want to start a fresh game without having to reload the page, but note that you will
               completely lose your current progress!<br><br>
+            <h4 class="instructionalHeader">Anything else to know?</h4><br>
+            It is important to understand how exactly tile placement is handled. If you board has no tiles on it,
+            you may place a tile in any slot. However, once there is at least one tile on the board, any new tiles
+            must be placed <strong>to the right</strong> of an existing tile. A few situations you may encounter (circle
+            represents a valid placement, slash represents an invalid placement):<br><br>
+            <img src="images/placement_ex0.png" alt="Placement Example 1" class="placementExample">
+            <img src="images/placement_ex1.png" alt="Placement Example 2" class="placementExample">
+            <img src="images/placement_ex2.png" alt="Placement Example 3" class="placementExample"><br><br>
+            Note that in the third example, the user would not be able to score the word in its current state due to 
+            the gap between the X and Z.
+            
           </div>
         </div>
       </div>
@@ -82,8 +93,12 @@
     </div>
     <div>
       <span class="pair">
+        <div class="label">Word Potential: </div>
+        <div id="potentialScore" class="value">0</div>
+      </span>
+      <span class="pair">
         <div class="label">Total Score: </div>
-        <div id="totalScore" class="value">0</div>
+        <div id="totalScore" class="value">0 points</div>
       </span>
       <span class="pair">
         <div class="label">Tiles In Bag: </div>

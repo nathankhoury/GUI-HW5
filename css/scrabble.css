@@ -73,6 +73,13 @@ body {
     text-decoration: underline;
 }
 
+.placementExample {
+    display: block;
+    width: 400px;
+    height: 80px;
+    margin-top: 20px;
+}
+
 /*** IDs ***/
 /*
 Flexbox resources:

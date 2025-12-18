@@ -1,3 +1,9 @@
+/*
+* TODO:
+        -Win condition
+        -Fill rack, don't waste tiles
+*/
+
 /**********************************
  *  global variables/objects
  **********************************/
@@ -26,6 +32,8 @@ board.keysToString = function() {       // format a string of keys in board.keys
 
     console.log(str);
 }
+
+board.placements = 0;    // number of tiles currently placed on board
 
 // rack
 let rack = {};          // rack object
@@ -78,6 +86,7 @@ function clearBoard() {
         board.tiles[i] = null;
         board.keys[i] = null;
         board.slots[i].empty();
+        board.placements = 0;
     }
 }
 
@@ -89,73 +98,81 @@ function clearRack() {
     }
 }
 
+function calculateScore() {
+    // begin constructing word string
+    let word = "";
+    // determine bonus letters i=6,8
+    let doubleKey1 = board.slots[6].find(".tile").attr("alt");
+    let val1 = 0;
+    let doubleKey2 = board.slots[8].find(".tile").attr("alt");
+    let val2 = 0;
+    console.log("double letters " + doubleKey1 + ", " + doubleKey2);
+    if (doubleKey1 !== undefined) {
+        val1 = bag.tiles[doubleKey1]["value"] * 2;
+    }
+    if (doubleKey2 !== undefined) {
+        val2 = bag.tiles[doubleKey2]["value"] * 2;
+    }
+    // begin partial sum
+    let partial = val1 + val2;
+    // determine word multiplier i=2,12
+    let wordMult = 1;
+    let wordKey1 = board.slots[2].find(".tile").attr("alt");
+    let wordKey2 = board.slots[12].find(".tile").attr("alt");
+    if (wordKey1 !== undefined) {
+        wordMult *= 2;
+        // update partial sum
+        partial += bag.tiles[wordKey1]["value"];
+    }
+    if (wordKey2 !== undefined) {
+        wordMult *= 2;
+        // update partial sum
+        partial += bag.tiles[wordKey2]["value"];
+    }
+    // iterate through all regular slots
+    let total = 0;
+    for (let i = 0; i < board.slots.length; i++) {
+        switch (i) {
+            case 2:
+                if (wordKey1 !== undefined) { word += wordKey1; }
+                break;
+            case 6:
+                if (doubleKey1 !== undefined) { word += doubleKey1; }
+                break;
+            case 8:
+                if (doubleKey2 !== undefined) { word += doubleKey2; }
+                break;
+            case 12:
+                if (wordKey2 !== undefined) { word += wordKey2; }
+                break;
+            default:
+                let curr = board.slots[i].find(".tile").attr("alt");
+                if (curr !== undefined) {
+                    total += bag.tiles[curr]["value"];
+                    // append letter
+                    word += curr;
+                }
+                break;
+        }
+    }
+    // total
+    total += partial;
+    total *= wordMult;
+
+    return {"score":total, "word":word};
+}
+
 function initSubmitButton() {
     $("#submit_button").on("click", function() {
-        // begin constructing word string
-        let word = "";
-        // determine bonus letters i=6,8
-        let doubleKey1 = board.slots[6].find(".tile").attr("alt");
-        let val1 = 0;
-        let doubleKey2 = board.slots[8].find(".tile").attr("alt");
-        let val2 = 0;
-        console.log("double letters " + doubleKey1 + ", " + doubleKey2);
-        if (doubleKey1 !== undefined) {
-            val1 = bag.tiles[doubleKey1]["value"] * 2;
-        }
-        if (doubleKey2 !== undefined) {
-            val2 = bag.tiles[doubleKey2]["value"] * 2;
-        }
-        // begin partial sum
-        let partial = val1 + val2;
-        // determine word multiplier i=2,12
-        let wordMult = 1;
-        let wordKey1 = board.slots[2].find(".tile").attr("alt");
-        let wordKey2 = board.slots[12].find(".tile").attr("alt");
-        if (wordKey1 !== undefined) {
-            wordMult *= 2;
-            // update partial sum
-            partial += bag.tiles[wordKey1]["value"];
-        }
-        if (wordKey2 !== undefined) {
-            wordMult *= 2;
-            // update partial sum
-            partial += bag.tiles[wordKey2]["value"];
-        }
-        // iterate through all regular slots
-        let total = 0;
-        for (let i = 0; i < board.slots.length; i++) {
-            switch (i) {
-                case 2:
-                    if (wordKey1 !== undefined) { word += wordKey1; }
-                    break;
-                case 6:
-                    if (doubleKey1 !== undefined) { word += doubleKey1; }
-                    break;
-                case 8:
-                    if (doubleKey2 !== undefined) { word += doubleKey2; }
-                    break;
-                case 12:
-                    if (wordKey2 !== undefined) { word += wordKey2; }
-                    break;
-                default:
-                    let curr = board.slots[i].find(".tile").attr("alt");
-                    if (curr !== undefined) {
-                        total += bag.tiles[curr]["value"];
-                        // append letter
-                        word += curr;
-                    }
-                    break;
-            }
-        }
-        // total
-        total += partial;
-        total *= wordMult;
+        // calculate the score
+        let result = calculateScore();
+
         // pass to game object
-        game.total += total;
+        game.total += result.score;
         // display total
         $("#totalScore").text(game.total);
         // make new list item in scored word list
-        let $li = $("<li>").text(word + " - " + total + " points");
+        let $li = $("<li>").text(result.word + " - " + result.score + " points");
         if (game.firstWord) {
             // set display to unset
             $("#scoredWordsHeader").attr("style", "display: unset;");
@@ -165,6 +182,8 @@ function initSubmitButton() {
         $("#scoredWordsList").append($li);
         // clear board
         clearBoard();
+        // update word potential 
+        $("#potentialScore").text("0 points");
         // clear rack
         clearRack();
         // fill rack again
@@ -184,6 +203,11 @@ function initReturnButton() {
             // move tile back to rack
             rack.tiles[i].appendTo(rack.slots[i]);   // move tile back to original rack slot
         }
+        // clear references
+        clearBoard();
+        // update UI
+        let result = calculateScore();
+        $("#potentialScore").text(result.score + " points");
     });
 }
 
@@ -256,7 +280,58 @@ function dropHandler(ev) {
         return;
     }
 
+    // check if slot to the left of target has a tile
+    for (let i = 0; i < board.slots.length; i++) {
+        if (board.slots[i][0] === slot) {       // [0] to get DOM element from jQuery object
+            // found the slot on board, check left slot
+            if (i > 0 && !board.slots[i - 1][0].querySelector(".tile") && board.placements > 0) {
+                console.log("left slot is empty, rejecting drop");
+                return;
+            }
+            break;
+        } else if (i < rack.slots.length && rack.slots[i][0] === slot) {
+            // found the slot on rack, no need to check left slot
+            break;
+        }
+    }
+
     slot.appendChild(tile);
+
+    // remove tile from previous location in rack or board if necessary
+    let indexB = board.tiles.indexOf(tile);
+    let indexR = rack.tiles.indexOf(tile);
+    if (indexB !== -1) {
+        // tile was on board, remove it
+        board.tiles[indexB] = null;
+        console.log("removed tile from board slot " + indexB);
+        board.placements--;
+    }
+    if (indexR !== -1) {
+        // tile was on rack, remove it
+        rack.tiles[indexR] = null;
+        console.log("removed tile from rack slot " + indexR);
+    }
+
+    // store tile in board.tiles
+    for (let i = 0; i < board.slots.length; i++) {
+        if (board.slots[i][0] === slot) {       // [0] to get DOM element from jQuery object
+            // found the slot on board
+            board.tiles[i] = tile;
+            console.log("placed tile " + tile.alt + " on board slot " + i);
+            board.placements++;
+            break;
+        } else if (i < rack.slots.length && rack.slots[i][0] === slot) {
+            // found the slot on rack
+            rack.tiles[i] = tile;
+            console.log("placed tile " + tile.alt + " on rack slot " + i);
+            break;
+        }
+    }
+
+    // dynamically calculate score
+    let result = calculateScore();
+    $("#potentialScore").text(result.score + " points");
+
 }
 
 // apply all the necessary handlers to implement drag-and-drop functionality
@@ -264,10 +339,13 @@ function initDragDrop() {
     // implementations from https://www.w3schools.com/html/html5_draganddrop.asp
     // set onDragStart
     $(".tile").on("dragstart", dragStartHandler);
-    // set onDragOver
-    $(".slot").on("dragover", dragoverHandler);
-    // set onDrop
-    $(".slot").on("drop", dropHandler);
+    
+    if (game.firstWord) {
+        // set onDragOver
+        $(".slot").on("dragover", dragoverHandler);
+        // set onDrop
+        $(".slot").on("drop", dropHandler);
+    }
 }
 
 // get a random letter from ScrabbleTiles
