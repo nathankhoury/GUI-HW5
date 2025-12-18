@@ -190,6 +190,11 @@ function calculateScore() {
 
 function initSubmitButton() {
     $("#submit_button").on("click", function() {
+
+        // Log the board state before submitting the word
+        console.log("Board tiles before submission:", board.tiles);
+        console.log("Rack tiles before submission:", rack.tiles);
+
         let status = validateWord();
         if (status === -1) {
             // word is not valid, there's a gap
@@ -234,19 +239,28 @@ function initSubmitButton() {
 }
 
 function initReturnButton() {
-    // set onclick listener
-    $("#return_button").on("click", function() {
-        // debug
-        console.log("Returning tiles to bag...");
-        // iterate through rack slots
-        for (let i = 0; i < rack.slots.length; i++) {
-            // move tile back to rack
-            if (rack.tiles[i])
-                rack.tiles[i].appendTo(rack.slots[i]);   // move tile back to original rack slot
-        }
-        // clear references
-        clearBoard(true);
-        // update UI
+    $("#return_button").on("click", function () {
+        console.log("Returning tiles to rack...");
+
+        // collect all tiles currently on the board
+        const tilesOnBoard = $("#board .tile").toArray();
+
+        // move them back to rack, left to right
+        tilesOnBoard.forEach(tile => {
+            for (let i = 0; i < rack.slots.length; i++) {
+                if (rack.slots[i].find(".tile").length === 0) {
+                    rack.slots[i].append(tile);
+                    break;
+                }
+            }
+        });
+
+        // reset board state safely
+        board.tiles.fill(null);
+        board.keys.fill(null);
+        board.placements = 0;
+
+        // update score preview
         let result = calculateScore();
         $("#potentialScore").text(result.score + " points");
     });
