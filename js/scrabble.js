@@ -241,7 +241,8 @@ function initReturnButton() {
         // iterate through rack slots
         for (let i = 0; i < rack.slots.length; i++) {
             // move tile back to rack
-            rack.tiles[i].appendTo(rack.slots[i]);   // move tile back to original rack slot
+            if (rack.tiles[i])
+                rack.tiles[i].appendTo(rack.slots[i]);   // move tile back to original rack slot
         }
         // clear references
         clearBoard(true);
@@ -440,7 +441,8 @@ function populateRack() {
     for (let i = 0; i < rack.slots.length; i++) {
         if (rack.slots[i].find(".tile").length > 0) {
             // slot already occupied, skip
-            console.log("rack slot " + i + " already occupied, skipping");
+            console.log("rack slot " + i + " already occupied, adding to rack.tiles and skipping");
+            rack.tiles[i] = rack.slots[i].find(".tile");
             continue;
         }
 
