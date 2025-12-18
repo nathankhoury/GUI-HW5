@@ -1,6 +1,7 @@
 /*
 * TODO:
         -Win condition
+        -Prevent submissions with gaps
         -Fill rack, don't waste tiles
 */
 
@@ -74,6 +75,28 @@ game.firstWord = true;
  *  global functions
  **********************************/
 
+function validateWord() {
+    let status = true, requireNothing = false, start = false, gap = false;
+
+    for (let i = 0; i < board.slots.length; i++) {
+        if (board.slots[i].find(".tile").length > 0) {
+            if (!start)
+                start = true;   // word has begun
+            if (requireNothing)
+                status = false; // found a gap in the word, return false
+        } else {
+            if (start) {
+                requireNothing = true;  // end of word found, no other letters allowed
+            }
+        }
+    }
+
+    if (!start)
+        status = false; // no tiles on board
+
+    return status;
+}
+
 function clearScoredWordsList() {
     // clear list
     $("#scoredWordsList").empty();
@@ -81,20 +104,22 @@ function clearScoredWordsList() {
     $("#scoredWordsHeader").attr("style", "display: none;");
 }
 
-function clearBoard() {
+function clearBoard(full) {
     for (let i = 0; i < board.slots.length; i++) {
         board.tiles[i] = null;
         board.keys[i] = null;
-        board.slots[i].empty();
+        if (full)
+            board.slots[i].empty();
         board.placements = 0;
     }
 }
 
-function clearRack() {
+function clearRack(full) {
     for (let i = 0; i < rack.slots.length; i++) {
         rack.tiles[i] = null;
         rack.keys[i] = null;
-        rack.slots[i].empty();
+        if (full)
+            rack.slots[i].empty();
     }
 }
 
@@ -164,6 +189,11 @@ function calculateScore() {
 
 function initSubmitButton() {
     $("#submit_button").on("click", function() {
+        if (!validateWord()) {
+            // word is not valid
+            return;
+        }
+
         // calculate the score
         let result = calculateScore();
 
@@ -181,11 +211,11 @@ function initSubmitButton() {
         // append to list
         $("#scoredWordsList").append($li);
         // clear board
-        clearBoard();
+        clearBoard(true);
         // update word potential 
         $("#potentialScore").text("0 points");
-        // clear rack
-        clearRack();
+        // clear rack, do not trample unused tiles
+        clearRack(false);
         // fill rack again
         populateRack();
         // re-initialize drag-and-drop functionality
@@ -204,7 +234,7 @@ function initReturnButton() {
             rack.tiles[i].appendTo(rack.slots[i]);   // move tile back to original rack slot
         }
         // clear references
-        clearBoard();
+        clearBoard(true);
         // update UI
         let result = calculateScore();
         $("#potentialScore").text(result.score + " points");
@@ -230,9 +260,9 @@ function initResetButton() {
         // reset firstWord flag
         game.firstWord = true;
         // clear board
-        clearBoard();
+        clearBoard(true);
         // clear rack
-        clearRack();
+        clearRack(true);
         // populate rack again
         populateRack();
         // re-initialize drag-and-drop functionality
@@ -377,6 +407,12 @@ function randomTile() {
 function populateRack() {
     console.log("populating the player's rack with tiles")
     for (let i = 0; i < rack.slots.length; i++) {
+        if (rack.slots[i].find(".tile").length > 0) {
+            // slot already occupied, skip
+            console.log("rack slot " + i + " already occupied, skipping");
+            continue;
+        }
+
         // get a random letter from ScrabbleTiles
         let key = randomTile();
         if (key === "NO TILES") {
