@@ -63,7 +63,6 @@ game.total = 0;      // total score
 
 game.firstWord = true;
 
-
 /**********************************
  *  global functions
  **********************************/
