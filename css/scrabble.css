@@ -1,3 +1,20 @@
+/*
+File:           scrabble.css
+Class:          COMP 4610 GUI Programming I
+Assignment:     HW5 , "Implementing a Bit of Scrabble with Drag-and-Drop" i.e. "One-Line Scrabble"
+Name:           Nathan Khoury
+Created:        12/15/2025
+Last Modified:  12/19/2025
+
+Description:    All of my custom stylings for the One-Line Scrabble web app.
+                Separated by tages, classes, and IDs for easier navigation.
+                A few bootstrap accordion classes are also styled here for
+                the instructions section. Theme is light brown/tan to match Scrabble
+                board colors, with colorful buttons for outward simplicity.
+                ALl buttons have corresponding _dummy styles for the dummy buttons
+                found in the instructions section.
+*/
+
 /*** Tags ***/
 body {
     text-align: center;
